@@ -1,13 +1,12 @@
-# coding: utf-8
-'''
-Basic camera example
-Default picture is saved as
-/sdcard/org.test.cameraexample/enter_file_name_here.jpg
-'''
-
 from os import getcwd
 from os.path import exists
 from os.path import splitext
+from base64 import b64encode
+from json import dumps
+import requests, json
+
+import os
+import io
 
 import kivy
 
@@ -22,11 +21,26 @@ from plyer import camera
 
 class ApiReconhecimentoObjeto:
     print("class------------")
+    encoded_string = ''
+    # # The name of the image file to annotate
+    # file_name = os.path.join(
+    #     os.path.dirname(__file__),
+    #     './arroz.jpg')
+    #
+    # # Loads the image into memory
+    # with io.open(file_name, 'rb') as image_file:
+    #     content = image_file.read()
+    #
+    # top = content
+    #
+    # with open('./arroz.jpg', "rb") as image_file:
+    #     encoded_string = base64.b64encode(image_file.read())
+    #
+    # print(encoded_string, encoded_string)
 
     def make_request(self):
-        print("make_request------------")
 
-        UrlRequest('https://api-gcv-python.herokuapp.com/retornoApiGoogleVision', self.print_json)
+        UrlRequest.get('http://0.0.0.0:5000/retor/', self.print_json)
 
     def print_json(self, req, result):
         for resultado in result:
@@ -85,27 +99,65 @@ class CameraDemoApp(App):
 class MsgPopup(Popup):
     def __init__(self, msg):
         super(MsgPopup, self).__init__()
-        UrlRequest('https://api-gcv-python.herokuapp.com/retornoApiGoogleVision', self.print_json)
 
-    def print_json(self, req, result):
+
         #
-        # for resultado in result:
-        #     self.ids.menssagem1.text = resultado
-        #     print resultado
+        # # The name of the image file to annotate
+        # file_name = os.path.join(
+        #     os.path.dirname(__file__),
+        #     './arroz.jpg')
+        #
+        # # Loads the image into memory
+        # with io.open(file_name, 'rb') as image_file:
+        #     imagem = image_file.read()
 
-        self.ids.menssagem1.text = result[0]
-        self.ids.menssagem2.text = result[1]
-        self.ids.menssagem3.text = result[2]
-        # self.ids.menssagem4.text = result[3]
-        # self.ids.menssagem5.text = result[4]
-        # self.ids.menssagem6.text = result[5]
-        # self.ids.menssagem7.text = result[6]
-        # self.ids.menssagem8.text = result[7]
-        # if result[8]:
-        #     print result[8]
+        ENCODING = 'utf-8'
+        IMAGE_NAME = './urso.jpg'
+        # JSON_NAME = 'output.json'
 
-        #     self.ids.menssagem9.text = result[8]
-        # self.ids.menssagem10.text = result[9]
+        # first: reading the binary stuff
+        # note the 'rb' flag
+        # result: bytes
+        with open(IMAGE_NAME, 'rb') as open_file:
+            byte_content = open_file.read()
+
+        base64_bytes = b64encode(byte_content)
+
+        base64_string = base64_bytes.decode(ENCODING)
+
+
+
+        response = requests.post('http://0.0.0.0:5000/retornoApiGoogleVision', json={"img": base64_bytes})
+
+        comments = json.loads(response.content)
+        self.print_json(comments)
+
+    def print_json(self, result):
+        resultado = []
+        tamanho = len(result)
+        for response in result:
+            resultado.append(response)
+
+        if tamanho >= 1:
+            self.ids.menssagem0.text = resultado[0]
+        if tamanho >= 2:
+            self.ids.menssagem1.text = resultado[1]
+        if tamanho >= 3:
+            self.ids.menssagem2.text = resultado[2]
+        if tamanho >= 4:
+            self.ids.menssagem3.text = resultado[3]
+        if tamanho >= 5:
+            self.ids.menssagem4.text = resultado[4]
+        if tamanho >= 6:
+            self.ids.menssagem5.text = resultado[5]
+        if tamanho >= 7:
+            self.ids.menssagem6.text = resultado[6]
+        if tamanho >= 8:
+            self.ids.menssagem7.text = resultado[7]
+        if tamanho >= 9:
+            self.ids.menssagem8.text = resultado[8]
+        if tamanho >= 10:
+            self.ids.menssagem9.text = resultado[9]
 
 
 

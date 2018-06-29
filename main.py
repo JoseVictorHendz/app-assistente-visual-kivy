@@ -2,11 +2,7 @@ from os import getcwd
 from os.path import exists
 from os.path import splitext
 from base64 import b64encode
-from json import dumps
 import requests, json
-
-import os
-import io
 
 import kivy
 
@@ -15,36 +11,7 @@ kivy.require('1.8.0')
 from kivy.app import App
 from kivy.uix.popup import Popup
 from kivy.uix.floatlayout import FloatLayout
-from kivy.network.urlrequest import UrlRequest
 from plyer import camera
-
-
-class ApiReconhecimentoObjeto:
-    print("class------------")
-    encoded_string = ''
-    # # The name of the image file to annotate
-    # file_name = os.path.join(
-    #     os.path.dirname(__file__),
-    #     './arroz.jpg')
-    #
-    # # Loads the image into memory
-    # with io.open(file_name, 'rb') as image_file:
-    #     content = image_file.read()
-    #
-    # top = content
-    #
-    # with open('./arroz.jpg', "rb") as image_file:
-    #     encoded_string = base64.b64encode(image_file.read())
-    #
-    # print(encoded_string, encoded_string)
-
-    def make_request(self):
-
-        UrlRequest.get('http://0.0.0.0:5000/retor/', self.print_json)
-
-    def print_json(self, req, result):
-        for resultado in result:
-            print resultado
 
 
 class CameraDemo(FloatLayout):
@@ -100,17 +67,6 @@ class MsgPopup(Popup):
     def __init__(self, msg):
         super(MsgPopup, self).__init__()
 
-
-        #
-        # # The name of the image file to annotate
-        # file_name = os.path.join(
-        #     os.path.dirname(__file__),
-        #     './arroz.jpg')
-        #
-        # # Loads the image into memory
-        # with io.open(file_name, 'rb') as image_file:
-        #     imagem = image_file.read()
-
         ENCODING = 'utf-8'
         IMAGE_NAME = './urso.jpg'
         # JSON_NAME = 'output.json'
@@ -125,9 +81,11 @@ class MsgPopup(Popup):
 
         base64_string = base64_bytes.decode(ENCODING)
 
+        response = requests.post('https://api-app-ggcv.herokuapp.com/retornoApiGoogleVision', json={"img": base64_bytes})
 
+        # response = requests.post('https://api-gcv-python.herokuapp.com/retornoApiGoogleVision', json={"img": base64_bytes})
 
-        response = requests.post('http://0.0.0.0:5000/retornoApiGoogleVision', json={"img": base64_bytes})
+        # response = requests.post('http://0.0.0.0:5000/retornoApiGoogleVision', json={"img": base64_bytes})
 
         comments = json.loads(response.content)
         self.print_json(comments)
